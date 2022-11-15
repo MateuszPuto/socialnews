@@ -1,0 +1,13 @@
+<h1>{{ post.title }}</h1>
+<p>
+	{{ post.content }}
+</p>
+
+<ul>
+	{% for comment in comments %}
+		<li>{{ comment.content }}</li>
+	{% endfor %}
+</ul>
+
+<a href="{% url 'forum:newcomment' post.id %}">|||Add new comment|||</a>
+

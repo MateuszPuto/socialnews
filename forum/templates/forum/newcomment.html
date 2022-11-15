@@ -1,0 +1,10 @@
+<form action="{% url 'forum:newcomment' post_id %}" method="post">
+	{% csrf_token %}
+	<fieldset>
+		<legend>Add new comment to the discussion:</legend>
+	
+		{{ comment }}
+
+		<input type="submit" value="Submit">
+	</fieldset>
+</form>
