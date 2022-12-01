@@ -1,10 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 
+from django.contrib.auth.models import User
+
 from datetime import datetime
 
 from .models import Topic, Comment
-from .forms import NewTopic, NewComment
+from .forms import NewTopic, NewComment, CreateAccount
 
 def index(request):
     latest_posts = Topic.objects.order_by('-pub_date')[:10]
@@ -13,6 +15,23 @@ def index(request):
             }
 
     return render(request, 'forum/index.html', context)
+
+def create_account(request):
+    if request.method == 'POST':
+        form = CreateAccount(request.POST)
+        if form.is_valid():
+            return HttpResponse('/thanks/')
+    else:
+        form = CreateAccount()
+
+    return render(request, 'forum/register.html', {'form': form})
+    
+
+    #new_user = User.objects.create_user(username, email=email, password=password)
+
+    #new_user.save()
+
+    return render(request, 'forum/register.html')
 
 def post(request, post_id):
     post = Topic.objects.get(pk=post_id)
