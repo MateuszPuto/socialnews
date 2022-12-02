@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+import forum
 
 urlpatterns = [
     path('forum/', include('forum.urls')),
     path('admin/', admin.site.urls),
+    path('accounts/profile/', forum.views.profile, name="profile"),
 ]

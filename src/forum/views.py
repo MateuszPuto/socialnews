@@ -15,6 +15,9 @@ def index(request):
                 'latest_posts': latest_posts,
             }
 
+    if request.user.is_authenticated:
+        context["user"] = request.user.get_username()
+
     return render(request, 'forum/index.html', context)
 
 def create_account(request):
@@ -31,6 +34,12 @@ def create_account(request):
         form = CreateAccount()
 
     return render(request, 'forum/register.html', {'form': form})
+
+def profile(request):
+    if request.user.is_authenticated:
+        return HttpResponse(f'{request.user.get_username()} profile')
+    else:
+        return HttpResponse("Something went wrong.")
 
 def post(request, post_id):
     post = Topic.objects.get(pk=post_id)

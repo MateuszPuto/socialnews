@@ -14,3 +14,5 @@ urlpatterns = [
         path('newpost.html/', views.addtopic, name="newpost"),
         path('', views.index),
     ]
+
+

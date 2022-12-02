@@ -1,6 +1,10 @@
 <a href="{% url 'forum:register' %}">Register</a>
 <a href="{% url 'forum:login' %}">Login</a>
 
+{% if user is not None %}
+	<span id="username">Logged in as {{ user }}</span>
+{% endif %}
+
 {% if latest_posts %}
 	<ol>
 		{% for post in latest_posts %}
