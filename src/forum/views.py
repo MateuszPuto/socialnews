@@ -1,7 +1,8 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 
 from datetime import datetime
 
@@ -20,18 +21,16 @@ def create_account(request):
     if request.method == 'POST':
         form = CreateAccount(request.POST)
         if form.is_valid():
-            return HttpResponse('/thanks/')
+            data = form.cleaned_data
+
+            new_user = User.objects.create_user(data["username"], email=data["email"], password=data["password"])
+            new_user.save()
+
+            return HttpResponse(f'Thanks {data["username"]} for registering on your site.')
     else:
         form = CreateAccount()
 
     return render(request, 'forum/register.html', {'form': form})
-    
-
-    #new_user = User.objects.create_user(username, email=email, password=password)
-
-    #new_user.save()
-
-    return render(request, 'forum/register.html')
 
 def post(request, post_id):
     post = Topic.objects.get(pk=post_id)

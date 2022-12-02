@@ -1,3 +1,6 @@
+<a href="{% url 'forum:register' %}">Register</a>
+<a href="{% url 'forum:login' %}">Login</a>
+
 {% if latest_posts %}
 	<ol>
 		{% for post in latest_posts %}
