@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect, Http404
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 
 from datetime import datetime
 
@@ -51,6 +52,7 @@ def post(request, post_id):
 
     return render(request, 'forum/post.html', context)
 
+@login_required(login_url='/accounts/login/')
 def addtopic(request):
     if request.method == 'POST':
         topic = NewTopic(request.POST)
@@ -60,8 +62,10 @@ def addtopic(request):
 
             tp = Topic()
             tp.title = data["title"]
+            tp.url = data["url"]
             tp.content = data["content"]
             tp.pub_date = datetime.now().__str__()
+            tp.username = request.user.get_username()
             tp.save()
 
             return HttpResponseRedirect('/forum/')
@@ -70,6 +74,7 @@ def addtopic(request):
 
     return render(request, 'forum/newtopic.html', {'topic': topic})
 
+@login_required(login_url='/accounts/login/')
 def comment(request, post_id):
     if request.method == 'POST':
         comment = NewComment(request.POST)
@@ -82,6 +87,7 @@ def comment(request, post_id):
             cm.content = data["content"]
             cm.votes = 0
             cm.pub_date = datetime.now().__str__()
+            cm.username = request.user.get_username()
             cm.save()
             
             return HttpResponseRedirect(f"/forum/{post_id}")

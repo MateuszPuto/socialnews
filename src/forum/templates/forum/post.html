@@ -1,11 +1,17 @@
 <h1>{{ post.title }}</h1>
+<a href="{{ post.url }}">{{ post.url }}</a>
 <p>
-	{{ post.content }}
+	{{ post.content }} <br><br>
+	<b>Posted by: {{ post.username }} </b>
 </p>
 
 <ul>
 	{% for comment in comments %}
-		<li>{{ comment.content }}</li>
+		<li>
+			<span>Likes: {{ comment.votes }} | </span>
+			<span><b>{{ comment.username }}:</b></span>
+			<span>{{ comment.content }}</span>
+		</li>
 	{% endfor %}
 </ul>
 
