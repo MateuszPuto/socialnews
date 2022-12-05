@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 
 from django.contrib.auth.models import User
@@ -8,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from datetime import datetime
 
 from .models import Topic, Comment
-from .forms import NewTopic, NewComment, CreateAccount
+from .forms import NewTopic, NewComment, CreateAccount, CheckPassword
 
 def index(request):
     latest_posts = Topic.objects.order_by('-pub_date')[:10]
@@ -36,11 +37,35 @@ def create_account(request):
 
     return render(request, 'forum/register.html', {'form': form})
 
+@login_required(login_url='/accounts/login/')
 def profile(request):
     if request.user.is_authenticated:
-        return HttpResponse(f'{request.user.get_username()} profile')
+        context = {}
+        context["username"] = request.user.get_username()
+        context["fullname"] = request.user.get_full_name()
+        context["email"] = request.user.email
+        context["password"] = ""
+
+        return render(request, 'forum/profile.html', context)
     else:
         return HttpResponse("Something went wrong.")
+
+@login_required(login_url='/accounts/login/')
+def check_password_if_valid(request):
+    user = request.user
+
+    if request.method == 'POST':
+        form = CheckPassword(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            if user.check_password(raw_password=data["password"]):
+              return HttpResponse("This is valid password.")
+            else:
+                return HttpResponse("This is not a valid password.")
+    else:
+        form = CheckPassword()
+
+    return render(request, 'forum/checkpassword.html', {'form': form})
 
 def post(request, post_id):
     post = Topic.objects.get(pk=post_id)
@@ -51,6 +76,13 @@ def post(request, post_id):
             } 
 
     return render(request, 'forum/post.html', context)
+
+def likeit(request, comment_id):
+    cm = Comment.objects.get(pk=comment_id)
+    cm.votes = cm.votes + 1
+    cm.save()
+
+    return redirect(request.META.get('HTTP_REFERER'))
 
 @login_required(login_url='/accounts/login/')
 def addtopic(request):

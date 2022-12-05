@@ -8,7 +8,14 @@
 <ul>
 	{% for comment in comments %}
 		<li>
-			<span>Likes: {{ comment.votes }} | </span>
+			<form action="{% url 'forum:addlike' comment.id %}" method="post">
+				{% csrf_token %}
+				<fieldset style="border:none">					
+					<span>Likes: {{ comment.votes }} | </span>
+			
+					<input type="submit" value="Like it">
+				</fieldset>
+			</form>
 			<span><b>{{ comment.username }}:</b></span>
 			<span>{{ comment.content }}</span>
 		</li>

@@ -13,3 +13,6 @@ class CreateAccount(forms.Form):
     username = forms.SlugField(max_length=30, validators=[validate_slug])
     email = forms.EmailField(validators=[validate_email])
     password = forms.CharField(widget=forms.PasswordInput)
+
+class CheckPassword(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput)
