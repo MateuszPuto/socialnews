@@ -2,13 +2,13 @@
 <a href="{{ post.url }}">{{ post.url }}</a>
 <p>
 	{{ post.content }} <br><br>
-	<b>Posted by: {{ post.username }} </b>
+	<b>Posted by: {{ post.username }}</b>
 </p>
 
 <ul>
 	{% for comment in comments %}
 		<li>
-			<form action="{% url 'forum:addlike' comment.id %}" method="post">
+			<form action="{% url 'forum:addlike' comment.uuid %}" method="post">
 				{% csrf_token %}
 				<fieldset style="border:none">					
 					<span>Likes: {{ comment.votes }} | </span>
@@ -22,5 +22,5 @@
 	{% endfor %}
 </ul>
 
-<a href="{% url 'forum:newcomment' post.id %}">|||Add new comment|||</a>
+<a href="{% url 'forum:newcomment' post.uuid %}">|||Add new comment|||</a>
 

@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 
 from datetime import datetime
 
-from .models import Topic, Comment
+from .models import Topic, Comment, VotedComments
 from .forms import NewTopic, NewComment, CreateAccount, CheckPassword
 
 def index(request):
@@ -28,7 +28,12 @@ def create_account(request):
         if form.is_valid():
             data = form.cleaned_data
 
+            if data["password"] != data["confirm_password"]:
+                raise Http404("Password needs to be identical.")
+
             new_user = User.objects.create_user(data["username"], email=data["email"], password=data["password"])
+            new_user.first_name = data["first_name"]
+            new_user.last_name = data["last_name"]
             new_user.save()
 
             return HttpResponse(f'Thanks {data["username"]} for registering on your site.')
@@ -67,8 +72,8 @@ def check_password_if_valid(request):
 
     return render(request, 'forum/checkpassword.html', {'form': form})
 
-def post(request, post_id):
-    post = Topic.objects.get(pk=post_id)
+def post(request, post_uuid):
+    post = Topic.objects.get(pk=post_uuid)
     comments = Comment.objects.all().filter(topic=post)
     context = {
             'post': post,
@@ -77,10 +82,17 @@ def post(request, post_id):
 
     return render(request, 'forum/post.html', context)
 
-def likeit(request, comment_id):
-    cm = Comment.objects.get(pk=comment_id)
-    cm.votes = cm.votes + 1
-    cm.save()
+def likeit(request, comment_uuid):
+    cm = Comment.objects.get(pk=comment_uuid)
+    
+    try:
+        vt = VotedComments.objects.get(voted=cm.uuid)
+    except VotedComments.DoesNotExist:
+        cm.votes = cm.votes + 1
+        cm.save()
+
+        vt = VotedComments.objects.create(username=request.user.get_username(), voted=cm.uuid)
+        vt.save()
 
     return redirect(request.META.get('HTTP_REFERER'))
 
@@ -107,7 +119,7 @@ def addtopic(request):
     return render(request, 'forum/newtopic.html', {'topic': topic})
 
 @login_required(login_url='/accounts/login/')
-def comment(request, post_id):
+def comment(request, post_uuid):
     if request.method == 'POST':
         comment = NewComment(request.POST)
 
@@ -115,15 +127,15 @@ def comment(request, post_id):
             data = comment.cleaned_data
             cm = Comment()
 
-            cm.topic = Topic.objects.get(pk=post_id)
+            cm.topic = Topic.objects.get(pk=post_uuid)
             cm.content = data["content"]
             cm.votes = 0
             cm.pub_date = datetime.now().__str__()
             cm.username = request.user.get_username()
             cm.save()
             
-            return HttpResponseRedirect(f"/forum/{post_id}")
+            return HttpResponseRedirect(f"/forum/{post_uuid}")
     else:
         comment = NewComment()
 
-    return render(request, 'forum/newcomment.html', {'comment': comment, 'post_id': post_id})
+    return render(request, 'forum/newcomment.html', {'comment': comment, 'post_uuid': post_uuid})

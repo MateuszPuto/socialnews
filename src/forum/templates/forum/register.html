@@ -1,5 +1,5 @@
 <form action="{% url 'forum:register' %}" method="post">
 	{% csrf_token %}
-	{{ form }}
+	{{ form|linebreaks }}
 	<input type="submit" value="Submit">
 </form>

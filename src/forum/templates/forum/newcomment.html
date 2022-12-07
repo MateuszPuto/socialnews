@@ -1,4 +1,4 @@
-<form action="{% url 'forum:newcomment' post_id %}" method="post">
+<form action="{% url 'forum:newcomment' post_uuid %}" method="post">
 	{% csrf_token %}
 	<fieldset>
 		<legend>Add new comment to the discussion:</legend>

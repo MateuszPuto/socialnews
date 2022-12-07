@@ -8,7 +8,7 @@
 {% if latest_posts %}
 	<ol>
 		{% for post in latest_posts %}
-			<li><a href="{{ post.id }}/">{{ post.title }}</li>
+			<li><a href="{{ post.uuid }}/">{{ post.title }}</li>
 		{% endfor %}
 	</ol>
 {% else %}

@@ -12,7 +12,10 @@ class NewComment(forms.Form):
 class CreateAccount(forms.Form):
     username = forms.SlugField(max_length=30, validators=[validate_slug])
     email = forms.EmailField(validators=[validate_email])
+    first_name = forms.CharField(max_length=50)
+    last_name = forms.CharField(max_length=50)
     password = forms.CharField(widget=forms.PasswordInput)
+    confirm_password = forms.CharField(widget=forms.PasswordInput)
 
 class CheckPassword(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
