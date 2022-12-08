@@ -8,7 +8,17 @@
 {% if latest_posts %}
 	<ol>
 		{% for post in latest_posts %}
-			<li><a href="{{ post.uuid }}/">{{ post.title }}</li>
+			<li>
+				<form action="{% url 'forum:vote' post.uuid %}" method="post">
+					{% csrf_token %}
+					<fieldset style="border:none">					
+						<span>Votes: {{ post.votes }} | </span>
+				
+						<input type="submit" value="Vote">
+					</fieldset>
+				</form>
+				<a href="{{ post.uuid }}/">{{ post.title }}
+			</li>
 		{% endfor %}
 	</ol>
 {% else %}

@@ -10,6 +10,7 @@ class Topic(models.Model):
     url = models.URLField(max_length=200)
     content = models.CharField(max_length=500)
     pub_date = models.DateTimeField('publish date')
+    votes = models.IntegerField(default=0)
     username = models.CharField(max_length=50)
 
     def __str__(self):
@@ -24,6 +25,10 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.content
+
+class VotedPosts(models.Model):
+    username = models.CharField(max_length=50)
+    voted = models.UUIDField(editable=True)
 
 class VotedComments(models.Model):
     username = models.CharField(max_length=50)

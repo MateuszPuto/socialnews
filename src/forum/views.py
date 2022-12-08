@@ -12,7 +12,7 @@ from datetime import datetime
 
 import random
 
-from .models import Topic, Comment, VotedComments, Secrets
+from .models import Topic, Comment, VotedComments, VotedPosts, Secrets
 from .forms import NewTopic, NewComment, CreateAccount, CheckPassword, ChangePassword
 
 def index(request):
@@ -109,7 +109,7 @@ def change_password(request):
             user_secret = data["secret"]
 
             secret = Secrets.objects.get(username=request.user.get_username()).secret
-            
+
             if user_secret == secret:
                 user = request.user
                 user.set_password(new_password)
@@ -133,11 +133,25 @@ def post(request, post_uuid):
 
     return render(request, 'forum/post.html', context)
 
+def voteit(request, post_uuid):
+    tp = Topic.objects.get(pk=post_uuid)
+    
+    try:
+        vt = VotedPosts.objects.get(username=request.user.get_username(), voted=tp.uuid)
+    except VotedPosts.DoesNotExist:
+        tp.votes = tp.votes + 1
+        tp.save()
+
+        vt = VotedPosts.objects.create(username=request.user.get_username(), voted=tp.uuid)
+        vt.save()
+
+    return redirect(request.META.get('HTTP_REFERER'))
+
 def likeit(request, comment_uuid):
     cm = Comment.objects.get(pk=comment_uuid)
     
     try:
-        vt = VotedComments.objects.get(voted=cm.uuid)
+        vt = VotedComments.objects.get(username=request.user.get_username(), voted=cm.uuid)
     except VotedComments.DoesNotExist:
         cm.votes = cm.votes + 1
         cm.save()
