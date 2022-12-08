@@ -2,14 +2,18 @@ from django.shortcuts import render, redirect
 
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 
+from django.core.mail import send_mail
+
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 
 from datetime import datetime
 
-from .models import Topic, Comment, VotedComments
-from .forms import NewTopic, NewComment, CreateAccount, CheckPassword
+import random
+
+from .models import Topic, Comment, VotedComments, Secrets
+from .forms import NewTopic, NewComment, CreateAccount, CheckPassword, ChangePassword
 
 def index(request):
     latest_posts = Topic.objects.order_by('-pub_date')[:10]
@@ -71,6 +75,53 @@ def check_password_if_valid(request):
         form = CheckPassword()
 
     return render(request, 'forum/checkpassword.html', {'form': form})
+
+@login_required(login_url='/accounts/login/')
+def recover_password(request):
+    secret = ""
+    for i in range(4):
+        secret += str(random.randrange(9))
+
+    Secrets.objects.filter(username=request.user).delete()
+    Secrets.objects.create(username=request.user, secret=secret)
+
+    send_mail(
+    'Socialnews password recovery',
+    f'Hello,\nyou have requested to recover your password. Your secret is: {secret}.\
+    Go to https://socialnews.com/forum/ to create new safe password.\
+    Please keep your password safe. If you expect that somebody may have come in possesion of your password\
+    please change it immediately.\n\nBest regards,\nSocialnews',
+    'socialnews@example.com',
+    [request.user.email],
+    fail_silently=False,
+    )
+
+    return redirect(request.META.get('HTTP_REFERER'))
+
+@login_required(login_url='/accounts/login/')
+def change_password(request):
+    if request.method == 'POST':
+        form = ChangePassword(request.POST)
+
+        if form.is_valid():
+            data = form.cleaned_data
+            new_password = data["password"]
+            user_secret = data["secret"]
+
+            secret = Secrets.objects.get(username=request.user.get_username()).secret
+            
+            if user_secret == secret:
+                user = request.user
+                user.set_password(new_password)
+                user.save()
+            else:
+                raise Http404("Incorrect secret provided.")
+        else:
+            raise Http404("Form input not valid.")
+    else:
+        form = ChangePassword()
+
+        return render(request, 'forum/changepassword.html', {'form': form})
 
 def post(request, post_uuid):
     post = Topic.objects.get(pk=post_uuid)

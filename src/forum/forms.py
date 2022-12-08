@@ -19,3 +19,7 @@ class CreateAccount(forms.Form):
 
 class CheckPassword(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
+
+class ChangePassword(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput)
+    secret = forms.IntegerField(max_value=9999)
