@@ -17,10 +17,23 @@
 						<input type="submit" value="Vote">
 					</fieldset>
 				</form>
-				<a href="{{ post.uuid }}/">{{ post.title }}
+				<a href="{{ post.uuid }}/">{{ post.title }}</a>
 			</li>
 		{% endfor %}
 	</ol>
+	<div class="pagination">
+		{% if latest_posts.has_previous %}
+		<a href="?page={{ latest_posts.previous_page_number }}">&laquo; previous</a>
+		{% endif %}
+
+		<span class="current">
+			Page {{ latest_posts.number }} of {{ latest_posts.paginator.num_pages }}.
+		</span>
+
+		{% if latest_posts.has_next %}
+			<a href="?page={{ latest_posts.next_page_number }}">next &raquo;</a>
+		{% endif %}
+	</div>
 {% else %}
 	<p>No posts are available.</p>
 {% endif %}

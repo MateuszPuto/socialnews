@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 
 from django.core.mail import send_mail
+from django.core.paginator import Paginator
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
@@ -16,9 +17,17 @@ from .models import Topic, Comment, VotedComments, VotedPosts, Secrets
 from .forms import NewTopic, NewComment, CreateAccount, CheckPassword, ChangePassword
 
 def index(request):
-    latest_posts = Topic.objects.order_by('-pub_date')[:10]
+    latest_posts = Topic.objects.order_by('-pub_date')
+    
+    paginator = Paginator(latest_posts, 10)
+    
+    if request.GET.get('page'):
+        page_number = request.GET.get('page')
+    else:
+        page_number = 1
+
     context = {
-                'latest_posts': latest_posts,
+                'latest_posts': paginator.page(page_number),
             }
 
     if request.user.is_authenticated:
