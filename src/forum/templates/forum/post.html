@@ -8,9 +8,9 @@
 <ul>
 	{% for comment in comments %}
 		<li>
-			<form action="{% url 'forum:addlike' comment.uuid %}" method="post">
+			<form action="{% url 'forum:addlike' comment.uuid %}" style="display: inline;" method="post">
 				{% csrf_token %}
-				<fieldset style="border:none">					
+				<fieldset style="border:none; display: inline;">					
 					<span>Likes: {{ comment.votes }} | </span>
 			
 					<input type="submit" value="Like it">
@@ -21,6 +21,22 @@
 		</li>
 	{% endfor %}
 </ul>
+
+<div class="pagination">
+	{% if comments.has_previous %}
+	<a href="?page={{ comments.previous_page_number }}">&laquo; previous</a>
+	{% endif %}
+
+	<span class="current">
+		Page {{ comments.number }} of {{ comments.paginator.num_pages }}.
+	</span>
+
+	{% if comments.has_next %}
+		<a href="?page={{ comments.next_page_number }}">next &raquo;</a>
+	{% endif %}
+</div>
+
+<br><br>
 
 <a href="{% url 'forum:newcomment' post.uuid %}">|||Add new comment|||</a>
 

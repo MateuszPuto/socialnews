@@ -1,6 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 
 from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.urls import reverse
 
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
@@ -19,7 +20,7 @@ from .forms import NewTopic, NewComment, CreateAccount, CheckPassword, ChangePas
 def index(request):
     latest_posts = Topic.objects.order_by('-pub_date')
     
-    paginator = Paginator(latest_posts, 10)
+    p = Paginator(latest_posts, 10)
     
     if request.GET.get('page'):
         page_number = request.GET.get('page')
@@ -27,7 +28,7 @@ def index(request):
         page_number = 1
 
     context = {
-                'latest_posts': paginator.page(page_number),
+                'latest_posts': p.page(page_number),
             }
 
     if request.user.is_authenticated:
@@ -105,7 +106,7 @@ def recover_password(request):
     fail_silently=False,
     )
 
-    return redirect(request.META.get('HTTP_REFERER'))
+    return HttpResponseRedirect(reverse('profile'))
 
 @login_required(login_url='/accounts/login/')
 def change_password(request):
@@ -134,10 +135,18 @@ def change_password(request):
 
 def post(request, post_uuid):
     post = Topic.objects.get(pk=post_uuid)
-    comments = Comment.objects.all().filter(topic=post)
+    comments = Comment.objects.all().filter(topic=post).order_by('-votes')
+
+    p = Paginator(comments, 3)
+
+    if request.GET.get('page'):
+        page_number = request.GET.get('page')
+    else:
+        page_number = 1
+
     context = {
             'post': post,
-            'comments': comments,
+            'comments': p.page(page_number),
             } 
 
     return render(request, 'forum/post.html', context)
@@ -154,10 +163,11 @@ def voteit(request, post_uuid):
         vt = VotedPosts.objects.create(username=request.user.get_username(), voted=tp.uuid)
         vt.save()
 
-    return redirect(request.META.get('HTTP_REFERER'))
+    return HttpResponseRedirect(reverse('index'))
 
 def likeit(request, comment_uuid):
     cm = Comment.objects.get(pk=comment_uuid)
+    post_uuid = cm.topic.uuid
     
     try:
         vt = VotedComments.objects.get(username=request.user.get_username(), voted=cm.uuid)
@@ -168,7 +178,7 @@ def likeit(request, comment_uuid):
         vt = VotedComments.objects.create(username=request.user.get_username(), voted=cm.uuid)
         vt.save()
 
-    return redirect(request.META.get('HTTP_REFERER'))
+    return HttpResponseRedirect(reverse('forum:post', args=(post_uuid,)))
 
 @login_required(login_url='/accounts/login/')
 def addtopic(request):

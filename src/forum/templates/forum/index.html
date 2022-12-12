@@ -9,9 +9,9 @@
 	<ol>
 		{% for post in latest_posts %}
 			<li>
-				<form action="{% url 'forum:vote' post.uuid %}" method="post">
+				<form action="{% url 'forum:vote' post.uuid %}" style="display: inline;" method="post">
 					{% csrf_token %}
-					<fieldset style="border:none">					
+					<fieldset style="border:none; display: inline;">					
 						<span>Votes: {{ post.votes }} | </span>
 				
 						<input type="submit" value="Vote">
