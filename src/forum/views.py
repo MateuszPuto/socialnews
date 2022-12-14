@@ -36,6 +36,43 @@ def index(request):
 
     return render(request, 'forum/index.html', context)
 
+def feed(request):
+    user_feed = Topic.objects.order_by('-votes')
+
+    context = {
+                'user_feed': user_feed,
+            }
+
+    if request.user.is_authenticated:
+        context["user"] = request.user.get_username()
+
+    return render(request, 'forum/feed.html', context)
+
+def newest(request):
+    newest_posts = Topic.objects.order_by('-pub_date')
+
+    context = {
+                'user_feed': newest_posts,
+            }
+
+    if request.user.is_authenticated:
+        context["user"] = request.user.get_username()
+
+    return render(request, 'forum/newest.html', context)
+
+## This view is supposed to return posts in geographical proximity
+def local(request):
+    local_posts = Topic.objects.order_by('-pub_date')
+
+    context = {
+                'user_feed': local_posts,
+            }
+
+    if request.user.is_authenticated:
+        context["user"] = request.user.get_username()
+
+    return render(request, 'forum/newest.html', context)
+
 def create_account(request):
     if request.method == 'POST':
         form = CreateAccount(request.POST)
@@ -106,7 +143,7 @@ def recover_password(request):
     fail_silently=False,
     )
 
-    return HttpResponseRedirect(reverse('profile'))
+    return HttpResponseRedirect(reverse('forum:profile'))
 
 @login_required(login_url='/accounts/login/')
 def change_password(request):
@@ -163,7 +200,7 @@ def voteit(request, post_uuid):
         vt = VotedPosts.objects.create(username=request.user.get_username(), voted=tp.uuid)
         vt.save()
 
-    return HttpResponseRedirect(reverse('index'))
+    return HttpResponseRedirect(reverse('forum:index'))
 
 def likeit(request, comment_uuid):
     cm = Comment.objects.get(pk=comment_uuid)

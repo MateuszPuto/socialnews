@@ -14,7 +14,7 @@ services:
             POSTGRES_DB: postgres
             POSTGRES_HOST: postgres
             POSTGRES_PORT: 5432
-
+            
     web-migration:
         build: .
         command: ./manage.py migrate
@@ -26,18 +26,53 @@ services:
             POSTGRES_DB: postgres
             POSTGRES_HOST: postgres
             POSTGRES_PORT: 5432
+
     postgres:
         image: postgres:13-alpine
-        
         ports: 
             - 5432:5432
-        #volumes:
-        #    - postgres_data:/var/lib/postgresql/data:rw/
         environment:
             POSTGRES_PASSWORD: postgres
             POSTGRES_USER: postgres
             POSTGRES_DB: postgres
             POSTGRES_HOST: postgres
             POSTGRES_PORT: 5432
-#volumes:
-#    postgres_data:
+
+    redis:
+        image: redis:7.0.6-alpine
+        ports: 
+            - 6379:6379
+
+    rabbitmq:
+        image: rabbitmq:3.11.4-alpine
+        ports:
+            - 5672:5672
+            - 15672:15672
+        environment:
+            - RABBITMQ_DEFAULT_USER=rabbit
+            - RABBITMQ_DEFAULT_PASS=password
+
+    worker:
+        image: worker
+        build:
+            context: .
+            dockerfile: worker.Dockerfile
+        command: ["celery", "-A", "celery_tasks", "worker", "--autoscale", "2"]
+        depends_on:
+            - rabbitmq
+        environment:
+            - RABBITMQ_DEFAULT_USER=rabbit
+            - RABBITMQ_DEFAULT_PASS=password
+
+    
+    flower:
+        image: flower
+        build:
+            context: .
+            dockerfile: flower.Dockerfile
+        command: ["celery", "flower", "--port=5566"]
+        ports:
+            - 5566:5566
+        depends_on:
+            - worker
+            - rabbitmq

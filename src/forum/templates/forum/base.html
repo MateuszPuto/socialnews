@@ -1,0 +1,32 @@
+{% block header %}
+    <a href="{% url 'forum:register' %}">Register</a>
+    <a href="{% url 'forum:login' %}">Login</a>
+
+    {% if user is not None %}
+        <span id="username">Logged in as <a href="{% url 'forum:profile' %}">{{ user }}</a></span>
+    {% endif %}
+
+    <br><br>
+
+    <div class="navbar">
+        <a href="{% url 'forum:feed' %}">Feed</a>
+        <a href="{% url 'forum:newest' %}">Newest</a>
+        <a href="{% url 'forum:local' %}">Local</a>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <p>Nothing to show.</p>
+{% endblock %}
+
+{% block footer %}
+    <hr>
+    <center>
+        <footer>
+            <a href="">About</a>
+            <a href="">Copyright</a>
+            <a href="">Contact</a>
+            <a href="">Sitemap</a>
+        </footer>
+    </center>
+{% endblock %}
