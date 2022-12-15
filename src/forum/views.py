@@ -19,9 +19,9 @@ from .forms import NewTopic, NewComment, CreateAccount, CheckPassword, ChangePas
 
 def index(request):
     latest_posts = Topic.objects.order_by('-pub_date')
-    
+
     p = Paginator(latest_posts, 10)
-    
+
     if request.GET.get('page'):
         page_number = request.GET.get('page')
     else:
@@ -184,13 +184,13 @@ def post(request, post_uuid):
     context = {
             'post': post,
             'comments': p.page(page_number),
-            } 
+            }
 
     return render(request, 'forum/post.html', context)
 
 def voteit(request, post_uuid):
     tp = Topic.objects.get(pk=post_uuid)
-    
+
     try:
         vt = VotedPosts.objects.get(username=request.user.get_username(), voted=tp.uuid)
     except VotedPosts.DoesNotExist:
@@ -205,7 +205,7 @@ def voteit(request, post_uuid):
 def likeit(request, comment_uuid):
     cm = Comment.objects.get(pk=comment_uuid)
     post_uuid = cm.topic.uuid
-    
+
     try:
         vt = VotedComments.objects.get(username=request.user.get_username(), voted=cm.uuid)
     except VotedComments.DoesNotExist:
@@ -254,7 +254,7 @@ def comment(request, post_uuid):
             cm.pub_date = datetime.now().__str__()
             cm.username = request.user.get_username()
             cm.save()
-            
+
             return HttpResponseRedirect(f"/forum/{post_uuid}")
     else:
         comment = NewComment()

@@ -15,7 +15,7 @@ urlpatterns = [
         path('comment/<slug:post_uuid>/', views.comment, name="newcomment"),
         path('addlike/<slug:comment_uuid>', views.likeit, name="addlike"),
         path('voteit/<slug:post_uuid>', views.voteit, name="vote"),
-        path('index.html/', views.index, name="index"),   
+        path('index.html/', views.index, name="index"),
         path('feed.html/', views.feed, name="feed"),
         path('newest.html/', views.newest, name="newest"),
         path('local.html/', views.local, name="local"),
@@ -23,5 +23,3 @@ urlpatterns = [
         path('<slug:post_uuid>/', views.post, name="post"),
         path('', views.index),
     ]
-
-

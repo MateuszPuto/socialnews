@@ -10,9 +10,9 @@
 		<li>
 			<form action="{% url 'forum:addlike' comment.uuid %}" style="display: inline;" method="post">
 				{% csrf_token %}
-				<fieldset style="border:none; display: inline;">					
+				<fieldset style="border:none; display: inline;">
 					<span>Likes: {{ comment.votes }} | </span>
-			
+
 					<input type="submit" value="Like it">
 				</fieldset>
 			</form>
@@ -39,4 +39,3 @@
 <br><br>
 
 <a href="{% url 'forum:newcomment' post.uuid %}">|||Add new comment|||</a>
-

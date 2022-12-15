@@ -1,6 +1,7 @@
 from celery import Celery
+import os
 
-app = Celery('celery_tasks', backend='rpc://', broker='amqp://rabbit:password@rabbitmq:5672//')
+app = Celery('celery_tasks', broker=os.environ['CELERY_BROKER'])
 
 @app.task
 def add(x, y):

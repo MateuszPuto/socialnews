@@ -7,9 +7,9 @@
 				<li>
 					<form action="{% url 'forum:vote' post.uuid %}" style="display: inline;" method="post">
 						{% csrf_token %}
-						<fieldset style="border:none; display: inline;">					
+						<fieldset style="border:none; display: inline;">
 							<span>Votes: {{ post.votes }} | </span>
-					
+
 							<input type="submit" value="Vote">
 						</fieldset>
 					</form>
