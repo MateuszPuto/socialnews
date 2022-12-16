@@ -1,9 +1,9 @@
 {% block header %}
-    <a href="{% url 'forum:register' %}">Register</a>
-    <a href="{% url 'forum:login' %}">Login</a>
+    <a href="{% url 'user:register' %}">Register</a>
+    <a href="{% url 'user:login' %}">Login</a>
 
     {% if user is not None %}
-        <span id="username">Logged in as <a href="{% url 'forum:profile' %}">{{ user }}</a></span>
+        <span id="username">Logged in as <a href="{% url 'user:profile' %}">{{ user }}</a></span>
     {% endif %}
 
     <br><br>

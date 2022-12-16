@@ -1,0 +1,11 @@
+name: build my app
+on: [push]
+jobs:
+  build-app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      name: install dependencies
+        - run: pip install requirements.txt
+      name: docker compose
+        - run: DOCKER_BUILDKIT=1 docker-compose up --build

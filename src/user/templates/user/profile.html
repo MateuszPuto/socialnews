@@ -1,0 +1,8 @@
+<h1>{{ username }} profile</h1>
+
+<h4>Name: {{ fullname }}</h4>
+<h4>Email: {{ email }}</h4>
+
+<a href="{% url 'user:checkpassword' %}">Check password</a><br>
+<a href="{% url 'user:recoverpassword' %}">Recover password via Email</a><br>
+<a href="{% url 'user:changepassword' %}">Change password</a><br>

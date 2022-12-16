@@ -16,9 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 import forum
+import user
 
 urlpatterns = [
     path('forum/', include('forum.urls')),
+    path('user/', include('user.urls')),
     path('admin/', admin.site.urls),
-    path('accounts/profile/', forum.views.profile, name="profile"),
+    path('accounts/profile/', user.views.profile, name="profile"),
 ]

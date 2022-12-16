@@ -33,7 +33,3 @@ class VotedPosts(models.Model):
 class VotedComments(models.Model):
     username = models.CharField(max_length=50)
     voted = models.UUIDField(editable=True)
-
-class Secrets(models.Model):
-    username = models.CharField(max_length=50)
-    secret = models.IntegerField()
