@@ -6,6 +6,6 @@ jobs:
     steps:
         - uses: actions/checkout@v3
         - name: install dependencies
-          run: pip install requirements.txt
+          run: pip install -r requirements.txt
         - name: docker compose
           run: DOCKER_BUILDKIT=1 docker-compose up --build
