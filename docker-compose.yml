@@ -58,11 +58,12 @@ services:
         build:
             context: .
             dockerfile: worker.Dockerfile
-        command: ["celery", "-A", "celery_tasks", "worker"]
+        working_dir: /src
+        command: ["celery", "-A", "socialnews", "worker"]
         depends_on:
             - rabbitmq
         environment:
-            - CELERY_BROKER=amqp://rabbit:password@rabbitmq:5672/my_vhost
+            - CELERY_BROKER_URL=amqp://rabbit:password@rabbitmq:5672/my_vhost
 
     flower:
         image: flower
@@ -75,3 +76,6 @@ services:
         depends_on:
             - worker
             - rabbitmq
+        environment:
+            - CELERY_BROKER_URL=amqp://rabbit:password@rabbitmq:5672/my_vhost
+

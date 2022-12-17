@@ -150,7 +150,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-#Redis cache
+# Redis cache
 
 CACHES = {
     'default': {
@@ -158,3 +158,8 @@ CACHES = {
         'LOCATION': 'redis://127.0.0.1:6379',
     }
 }
+
+# Celery message queue
+
+CELERY_RESULT_BACKEND = "rpc://"
+CELERY_BROKER_URL= "amqp://rabbit:password@rabbitmq:5672/my_vhost"

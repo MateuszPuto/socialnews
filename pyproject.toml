@@ -17,6 +17,7 @@ flower = "^1.2.0"
 rabbitmq = "^0.2.0"
 pre-commit = "^2.20.0"
 django-cleanup = "^6.0.0"
+faker = "^15.3.4"
 
 
 [build-system]
