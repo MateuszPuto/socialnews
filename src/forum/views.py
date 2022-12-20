@@ -14,6 +14,8 @@ from datetime import datetime
 
 import random
 
+from socialnews.tasks import add_nums
+
 from .models import Topic, Comment, VotedComments, VotedPosts
 from .forms import NewTopic, NewComment
 
@@ -28,7 +30,7 @@ def index(request):
         page_number = 1
 
     context = {
-                'latest_posts': p.page(page_number),
+                'user_feed': p.page(page_number),
             }
 
     if request.user.is_authenticated:
@@ -62,6 +64,10 @@ def newest(request):
 
 ## This view is supposed to return posts in geographical proximity
 def local(request):
+    # Doing some message queue work
+    for i in range(0, 100):
+        add_nums.delay(5, i)
+
     local_posts = Topic.objects.order_by('-pub_date')
 
     context = {

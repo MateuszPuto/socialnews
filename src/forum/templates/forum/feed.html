@@ -1,9 +1,9 @@
 {% extends './base.html' %}
 
 {%block content %}
-	{% if latest_posts %}
+	{% if user_feed %}
 		<ol>
-			{% for post in latest_posts %}
+			{% for post in user_feed %}
 				<li>
 					<form action="{% url 'forum:vote' post.uuid %}" style="display: inline;" method="post">
 						{% csrf_token %}
@@ -18,16 +18,16 @@
 			{% endfor %}
 		</ol>
 		<div class="pagination">
-			{% if latest_posts.has_previous %}
-			<a href="?page={{ latest_posts.previous_page_number }}">&laquo; previous</a>
+			{% if user_feed.has_previous %}
+			<a href="?page={{ user_feed.previous_page_number }}">&laquo; previous</a>
 			{% endif %}
 
 			<span class="current">
-				Page {{ latest_posts.number }} of {{ latest_posts.paginator.num_pages }}.
+				Page {{ user_feed.number }} of {{ user_feed.paginator.num_pages }}.
 			</span>
 
-			{% if latest_posts.has_next %}
-				<a href="?page={{ latest_posts.next_page_number }}">next &raquo;</a>
+			{% if user_feed.has_next %}
+				<a href="?page={{ user_feed.next_page_number }}">next &raquo;</a>
 			{% endif %}
 		</div>
 	{% else %}

@@ -162,4 +162,4 @@ CACHES = {
 # Celery message queue
 
 CELERY_RESULT_BACKEND = "rpc://"
-CELERY_BROKER_URL= "amqp://rabbit:password@rabbitmq:5672/my_vhost"
+CELERY_BROKER_URL= "amqp://rabbitmq:rabbitmq@rabbitmq:5672/my_vhost"

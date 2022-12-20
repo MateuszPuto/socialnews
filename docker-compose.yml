@@ -1,3 +1,5 @@
+
+
 version: "3.9"
 services:
     web:
@@ -49,8 +51,8 @@ services:
             - 5672:5672
             - 15672:15672
         environment:
-            - RABBITMQ_DEFAULT_USER=rabbit
-            - RABBITMQ_DEFAULT_PASS=password
+            - RABBITMQ_DEFAULT_USER=rabbitmq
+            - RABBITMQ_DEFAULT_PASS=rabbitmq
             - RABBITMQ_DEFAULT_VHOST=my_vhost
 
     worker:
@@ -63,7 +65,7 @@ services:
         depends_on:
             - rabbitmq
         environment:
-            - CELERY_BROKER_URL=amqp://rabbit:password@rabbitmq:5672/my_vhost
+            - CELERY_BROKER_URL=amqp://rabbitmq:rabbitmq@rabbitmq:5672/my_vhost
 
     flower:
         image: flower
@@ -77,5 +79,4 @@ services:
             - worker
             - rabbitmq
         environment:
-            - CELERY_BROKER_URL=amqp://rabbit:password@rabbitmq:5672/my_vhost
-
+            - CELERY_BROKER_URL=amqp://rabbitmq:rabbitmq@rabbitmq:5672/my_vhost
