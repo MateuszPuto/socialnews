@@ -7,4 +7,14 @@
 
 		<input type="submit" value="Submit">
 	</fieldset>
+
+	{% if topic.location %}
+		<fieldset>
+			<legend>Set location:</legend>
+			
+			{{ location }}
+
+			<input type="submit" value="Submit">
+		</fieldset>
+	{% endif %}
 </form>

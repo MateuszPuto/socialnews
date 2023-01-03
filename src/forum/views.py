@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.urls import reverse
@@ -14,10 +14,17 @@ from datetime import datetime
 
 import random
 
-from socialnews.tasks import add_nums
+import folium
 
-from .models import Topic, Comment, VotedComments, VotedPosts
-from .forms import NewTopic, NewComment
+import geocoder
+from ipware import get_client_ip
+
+from elasticsearch import Elasticsearch
+
+from socialnews.tasks import haversine_distance
+
+from .models import Topic, Comment, VotedComments, VotedPosts, Location, UserLocal
+from .forms import NewTopic, NewComment, NewLocation
 
 def index(request):
     latest_posts = Topic.objects.order_by('-pub_date')
@@ -38,6 +45,7 @@ def index(request):
 
     return render(request, 'forum/index.html', context)
 
+## This view should return posts that match user interests
 def feed(request):
     user_feed = Topic.objects.order_by('-votes')
 
@@ -62,13 +70,26 @@ def newest(request):
 
     return render(request, 'forum/newest.html', context)
 
-## This view is supposed to return posts in geographical proximity
 def local(request):
-    # Doing some message queue work
-    for i in range(0, 100):
-        add_nums.delay(5, i)
+    posts = Location.objects.select_related('relates')
 
-    local_posts = Topic.objects.order_by('-pub_date')
+    ip, is_routable = get_client_ip(request)
+    curr = geocoder.ipinfo(ip).latlng
+
+    for post in posts:
+        dst = haversine_distance.delay(curr, (post.latitude, post.longitude)).get()
+
+        if dst < 1000:
+            local_user_post =  UserLocal.objects.create(topic=Topic.objects.get(pk=post.relates.uuid), username=request.user.get_username(), distance=dst)
+            local_user_post.save()
+
+    user_local = UserLocal.objects.prefetch_related('topic').order_by('-distance')
+    
+    lst = []
+    for u in user_local:
+        lst.append(u.topic.uuid)
+
+    local_posts = Topic.objects.filter(pk__in=lst)
 
     context = {
                 'user_feed': local_posts,
@@ -81,9 +102,14 @@ def local(request):
 
 def post(request, post_uuid):
     post = Topic.objects.get(pk=post_uuid)
-    comments = Comment.objects.all().filter(topic=post).order_by('-votes')
+    comments = Comment.objects.filter(topic=post).order_by('-votes')
 
     p = Paginator(comments, 3)
+
+    if Location.objects.filter(relates=post).exists():
+        loc  = Location.objects.get(relates=post).__str__()
+    else:
+        loc = "Null"
 
     if request.GET.get('page'):
         page_number = request.GET.get('page')
@@ -93,6 +119,7 @@ def post(request, post_uuid):
     context = {
             'post': post,
             'comments': p.page(page_number),
+            "loc": loc,
             }
 
     return render(request, 'forum/post.html', context)
@@ -133,20 +160,37 @@ def addtopic(request):
 
         if topic.is_valid():
             data = topic.cleaned_data
-
             tp = Topic()
             tp.title = data["title"]
             tp.url = data["url"]
             tp.content = data["content"]
             tp.pub_date = datetime.now().__str__()
             tp.username = request.user.get_username()
+            tp.geography = data["location"]
             tp.save()
 
-            return HttpResponseRedirect('/forum/')
+            if tp.geography:
+                location = NewLocation(request.POST)
+
+                if location.is_valid():
+                    loc_data = location.cleaned_data
+
+                    loc = Location()
+                    loc.relates = tp
+                    loc.latitude = loc_data["latitude"]
+                    loc.longitude = loc_data["longitude"]
+                    loc.save()
+
+                    return HttpResponseRedirect('/forum/')
+                else:
+                    render(request, 'forum/newtopic.html', {'topic': topic, 'location': location})
+            else:
+                return HttpResponseRedirect('/forum/')
     else:
         topic = NewTopic()
+        location = NewLocation()
 
-    return render(request, 'forum/newtopic.html', {'topic': topic})
+    return render(request, 'forum/newtopic.html', {'topic': topic, 'location': location})
 
 @login_required(login_url='/accounts/login/')
 def comment(request, post_uuid):

@@ -12,6 +12,7 @@ class Topic(models.Model):
     pub_date = models.DateTimeField('publish date')
     votes = models.IntegerField(default=0)
     username = models.CharField(max_length=50)
+    geography = models.BooleanField()
 
     def __str__(self):
         return self.title
@@ -33,3 +34,16 @@ class VotedPosts(models.Model):
 class VotedComments(models.Model):
     username = models.CharField(max_length=50)
     voted = models.UUIDField(editable=True)
+
+class Location(models.Model):
+    relates = models.ForeignKey(Topic, on_delete=models.CASCADE)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+
+    def __str__(self):
+        return str(self.latitude) + " : " + str(self.longitude)
+
+class UserLocal(models.Model):
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
+    username = models.CharField(max_length=50)
+    distance = models.FloatField()
