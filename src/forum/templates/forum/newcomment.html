@@ -1,10 +1,14 @@
-<form action="{% url 'forum:newcomment' post_uuid %}" method="post">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<form action="{% url 'forum:newcomment' post_uuid %}" method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
 	{% csrf_token %}
 	<fieldset>
 		<legend>Add new comment to the discussion:</legend>
 
 		{{ comment }}
 
-		<input type="submit" value="Submit">
+		<input type="submit" value="Submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
 	</fieldset>
 </form>

@@ -1,22 +1,60 @@
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+                colors: {
+                  brand: {
+                    50: "#EFF5FA",
+                    100: "#D4E2F2",
+                    200: "#A0C1E3",
+                    300: "#6D9FD4",
+                    400: "#3A7DC5",
+                    500: "#2B5C92",
+                    600: "#234B76",
+                    700: "#1A3757",
+                    800: "#11263B",
+                    900: "#08121C"
+                  }
+                }
+              }
+          }
+        }
+      </script>
+    <style type="text/tailwindcss">
+        @layer components {
+            .btn-blue {
+              @apply text-lg text-white font-bold bg-brand-300 hover:bg-brand-500 hover:text-white p-1 rounded;
+            }
+
+            .btn-footer {
+                @apply text-lg text-black font-bold bg-gray-200 hover:bg-gray-400 hover:text-white p-1 rounded;
+            }
+        }
+      </style>
+
+</head>
+
 {% block header %}
-    <a href="{% url 'user:register' %}">Register</a>
-    <a href="{% url 'user:login' %}">Login</a>
+<div class="bg-brand-100">
+    <a href="{% url 'user:register' %}" class="btn-blue">Register</a>
+    <a href="{% url 'user:login' %}" class="btn-blue">Login</a>
 
     {% if user is not None %}
-        <span id="username">Logged in as <a href="{% url 'user:profile' %}">{{ user }}</a></span>
+        <span id="username">Logged in as <a href="{% url 'user:profile' %}" class="btn-blue">{{ user }}</a></span>
     {% endif %}
+</div>
+<h1 class="text-3xl font-bold underline">Socialnews</h1>
+<div class="navbar">
+    <a href="{% url 'forum:feed' %}" class="btn-blue">Feed</a>
+    <a href="{% url 'forum:newest' %}" class="btn-blue">Newest</a>
+    <a href="{% url 'forum:local' %}" class="btn-blue">Local</a>
 
     <span style="float: right;">
         <input type="text" id="searchbar">
     </span>
-
-    <br><br>
-
-    <div class="navbar">
-        <a href="{% url 'forum:feed' %}">Feed</a>
-        <a href="{% url 'forum:newest' %}">Newest</a>
-        <a href="{% url 'forum:local' %}">Local</a>
-    </div>
+</div>
 {% endblock %}
 
 {% block content %}
@@ -27,10 +65,10 @@
     <hr>
     <center>
         <footer>
-            <a href="">About</a>
-            <a href="">Copyright</a>
-            <a href="">Contact</a>
-            <a href="">Sitemap</a>
+            <a href="" class="btn-footer">About</a>
+            <a href="" class="btn-footer">Copyright</a>
+            <a href="" class="btn-footer">Contact</a>
+            <a href="" class="btn-footer">Sitemap</a>
         </footer>
     </center>
 {% endblock %}
