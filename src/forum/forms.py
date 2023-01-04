@@ -13,3 +13,6 @@ class NewComment(forms.Form):
 class NewLocation(forms.Form):
     latitude = forms.FloatField(required=False)
     longitude = forms.FloatField(required=False)
+
+class Distance(forms.Form):
+    range = forms.IntegerField(widget=forms.NumberInput(attrs={'type':'range', 'step': '1'}))

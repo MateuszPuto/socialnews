@@ -1,5 +1,6 @@
 <head>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/flowbite@1.6.0/dist/flowbite.min.css" />
     <script>
         tailwind.config = {
           theme: {
@@ -75,6 +76,10 @@
         {% block navigation %}
         {% endblock %}
       </div>
+      
+      {% block toggle %}
+      {% endblock %}
+      
       {% block content %}
           <p>Nothing to show.</p>
       {% endblock %}
@@ -92,4 +97,6 @@
             <a href="" class="btn-footer">Sitemap</a>
         </footer>
     </center>
+
+    <script src="https://unpkg.com/flowbite@1.6.0/dist/flowbite.min.js"></script>
 {% endblock %}

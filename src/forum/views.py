@@ -24,7 +24,7 @@ from elasticsearch import Elasticsearch
 from socialnews.tasks import haversine_distance
 
 from .models import Topic, Comment, VotedComments, VotedPosts, Location, UserLocal
-from .forms import NewTopic, NewComment, NewLocation
+from .forms import NewTopic, NewComment, NewLocation, Distance
 
 def index(request):
     latest_posts = Topic.objects.order_by('-pub_date')
@@ -71,15 +71,30 @@ def newest(request):
     return render(request, 'forum/newest.html', context)
 
 def local(request):
+    if request.method == 'POST':
+        range = Distance(request.POST)
+
+        if range.is_valid():
+            data = range.cleaned_data
+            distance = 10 * data["range"]
+        else:
+            range = Distance()
+            distance = 1000
+    else:
+        range = Distance()
+        distance = 1000
+
     posts = Location.objects.select_related('relates')
 
     ip, is_routable = get_client_ip(request)
-    curr = geocoder.ipinfo(ip).latlng
+    curr = geocoder.ipinfo("31.182.202.212").latlng
+
+    UserLocal.objects.all().delete()
 
     for post in posts:
         dst = haversine_distance.delay(curr, (post.latitude, post.longitude)).get()
 
-        if dst < 1000:
+        if dst <= distance:
             local_user_post =  UserLocal.objects.create(topic=Topic.objects.get(pk=post.relates.uuid), username=request.user.get_username(), distance=dst)
             local_user_post.save()
 
@@ -92,13 +107,14 @@ def local(request):
     local_posts = Topic.objects.filter(pk__in=lst)
 
     context = {
+                'range': range,
                 'user_feed': local_posts,
             }
 
     if request.user.is_authenticated:
         context["user"] = request.user.get_username()
 
-    return render(request, 'forum/newest.html', context)
+    return render(request, 'forum/local.html', context)
 
 def post(request, post_uuid):
     post = Topic.objects.get(pk=post_uuid)
