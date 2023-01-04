@@ -18,6 +18,11 @@ rabbitmq = "^0.2.0"
 pre-commit = "^2.20.0"
 django-cleanup = "^6.0.0"
 faker = "^15.3.4"
+elasticsearch = "^8.5.3"
+geocoder = "^1.38.1"
+django-ipware = "^4.0.2"
+numpy = "^1.24.1"
+folium = "^0.14.0"
 
 
 [build-system]

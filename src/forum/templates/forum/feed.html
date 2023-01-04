@@ -1,33 +1,34 @@
-{% extends './base.html' %}
+{% extends './main.html' %}
 
 {%block content %}
 	{% if user_feed %}
-		<ol>
+		<ol class="divide-y-2 divide-base-900 ml-20">
 			{% for post in user_feed %}
-				<li>
+				<li class="flex flex-row mb-3 mt-3">
 					<form action="{% url 'forum:vote' post.uuid %}" style="display: inline;" method="post">
 						{% csrf_token %}
-						<fieldset style="border:none; display: inline;">
-							<span>Votes: {{ post.votes }} | </span>
-
-							<input type="submit" value="Vote">
+						<fieldset style="border:none; display: inline;" class="w-32 font-bold">
+								<span>Votes: {{ post.votes }} | </span>
+								<input type="submit" value="Vote" class="btn-vote">
 						</fieldset>
 					</form>
-					<a href="/forum/{{ post.uuid }}/">{{ post.title }}</a>
+					<div class="w-96">
+						<a href="/forum/{{ post.uuid }}/" class="underline text-blue-500 visited:text-purple-500">{{ post.title }}</a>
+					</div>
 				</li>
 			{% endfor %}
 		</ol>
 		<div class="pagination">
 			{% if user_feed.has_previous %}
-			<a href="?page={{ user_feed.previous_page_number }}">&laquo; previous</a>
+			<a href="?page={{ user_feed.previous_page_number }}" class="btn-pag">&laquo; previous</a>
 			{% endif %}
 
-			<span class="current">
+			<span class="current text-base">
 				Page {{ user_feed.number }} of {{ user_feed.paginator.num_pages }}.
 			</span>
 
 			{% if user_feed.has_next %}
-				<a href="?page={{ user_feed.next_page_number }}">next &raquo;</a>
+				<a href="?page={{ user_feed.next_page_number }}" class="btn-pag">next &raquo;</a>
 			{% endif %}
 		</div>
 	{% else %}

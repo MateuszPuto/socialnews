@@ -1,4 +1,4 @@
-FROM python:3.9-alpine
+FROM python:3.11-alpine
 EXPOSE 8000
 WORKDIR /src
 RUN --mount=type=cache,target=/var/cache/apk  \
@@ -14,6 +14,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 # https://docs.python.org/3/using/cmdline.html#envvar-PYTHONUNBUFFERED
 ENV PYTHONUNBUFFERED 1
 
+RUN apk add python3-dev py3-numpy build-base
 COPY requirements.txt .
 RUN --mount=type=cache,target=$PIP_CACHE_DIR \
     pip install -r requirements.txt && \

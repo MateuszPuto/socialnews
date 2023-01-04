@@ -1,11 +1,16 @@
-<form action="{% url 'forum:newpost' %}" method="post">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<form action="{% url 'forum:newpost' %}" method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
 	{% csrf_token %}
+	<div class="text-gray-500 font-bold bg-gray-200 items-center">
 	<fieldset>
 		<legend>Add new topic for discussion:</legend>
 
 		{{ topic }}
 
-		<input type="submit" value="Submit">
+		<input type="submit" value="Submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
 	</fieldset>
 
 	{% if topic.location %}
@@ -14,7 +19,6 @@
 			
 			{{ location }}
 
-			<input type="submit" value="Submit">
 		</fieldset>
 	{% endif %}
 </form>

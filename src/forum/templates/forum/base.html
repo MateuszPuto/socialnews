@@ -31,35 +31,56 @@
             .btn-footer {
                 @apply text-lg text-black font-bold bg-gray-200 hover:bg-gray-400 hover:text-white p-1 rounded;
             }
+
+            .btn-vote {
+              @apply text-lg text-white font-bold bg-brand-700 hover:bg-white hover:border-dashed border-gray-700 border-2 hover:text-black rounded cursor-pointer;
+            }
+
+            .btn-nav {
+              @apply text-lg text-white font-bold bg-brand-500 hover:bg-brand-300 p-3 rounded;
+            }
+
+            .btn-pag {
+              @apply text-lg text-white font-bold bg-brand-500 hover:bg-brand-300 p-1 rounded;
+            }
         }
       </style>
 
 </head>
 
 {% block header %}
-<div class="bg-brand-100">
-    <a href="{% url 'user:register' %}" class="btn-blue">Register</a>
-    <a href="{% url 'user:login' %}" class="btn-blue">Login</a>
+  <div class="bg-brand-800 h-24">
+      <a href="{% url 'user:register' %}" class="btn-blue">Register</a>
+      <a href="{% url 'user:login' %}" class="btn-blue">Login</a>
 
-    {% if user is not None %}
-        <span id="username">Logged in as <a href="{% url 'user:profile' %}" class="btn-blue">{{ user }}</a></span>
-    {% endif %}
-</div>
-<h1 class="text-3xl font-bold underline">Socialnews</h1>
-<div class="navbar">
-    <a href="{% url 'forum:feed' %}" class="btn-blue">Feed</a>
-    <a href="{% url 'forum:newest' %}" class="btn-blue">Newest</a>
-    <a href="{% url 'forum:local' %}" class="btn-blue">Local</a>
+      {% if user is not None %}
+          <span id="username" class="text-white">Logged in as <a href="{% url 'user:profile' %}" class="btn-blue">{{ user }}</a></span>
+      {% endif %}
 
-    <span style="float: right;">
-        <input type="text" id="searchbar">
+      <span style="float: right;">
+        <form class="flex flex-row">   
+          <input type="search" id="searchbar" class="grow text-gray-900 border border-gray-300 rounded-lg bg-gray-50" placeholder="Search posts" required>
+          <button type="submit" class="btn-blue">Search</button>
+        </form>
     </span>
-</div>
+
+    <h1 class="text-5xl text-center text-white font-bold underline mt-1 mb-1">Socialnews</h1>
+  </div>
 {% endblock %}
 
-{% block content %}
-    <p>Nothing to show.</p>
-{% endblock %}
+<div class="flex flex-row bg=white">
+	<div class="w-1/6"></div>
+	  <div class"w-2/3">
+      <div class="mb-6">
+        {% block navigation %}
+        {% endblock %}
+      </div>
+      {% block content %}
+          <p>Nothing to show.</p>
+      {% endblock %}
+    </div>
+  <div class="w-1/6"></div>
+</div>
 
 {% block footer %}
     <hr>

@@ -1,42 +1,52 @@
-<h1>{{ post.title }}</h1>
-<h3>{{ loc }}</h3>
-<a href="{{ post.url }}">{{ post.url }}</a>
-<p>
-	{{ post.content }} <br><br>
-	<b>Posted by: {{ post.username }}</b>
-</p>
+{% extends './base.html' %}
 
-<ul>
-	{% for comment in comments %}
-		<li>
-			<form action="{% url 'forum:addlike' comment.uuid %}" style="display: inline;" method="post">
-				{% csrf_token %}
-				<fieldset style="border:none; display: inline;">
-					<span>Likes: {{ comment.votes }} | </span>
+{% block navigation %}
+	<div class="navbar inline">
+		<a href="{% url 'forum:feed' %}" class="btn-nav">Redirect to Feed</a>
+	</div>
+{% endblock %}
 
-					<input type="submit" value="Like it">
-				</fieldset>
-			</form>
-			<span><b>{{ comment.username }}:</b></span>
-			<span>{{ comment.content }}</span>
-		</li>
-	{% endfor %}
-</ul>
+{% block content %}
+	<h1 class="text-3xl font-bold">{{ post.title }}</h1>
+	<h3 class="text-lg">{{ loc }}</h3>
+	<a href="{{ post.url }}" class="underline text-blue-500 visited:text-purple-500 mb-2">{{ post.url }}</a>
+	<p class="text-base">
+		{{ post.content }} <br><br>
+		<div class="font-bold">Posted by: {{ post.username }}</div>
+	</p>
 
-<div class="pagination">
-	{% if comments.has_previous %}
-	<a href="?page={{ comments.previous_page_number }}">&laquo; previous</a>
-	{% endif %}
+	<ul class="divide-y-2 divide-base-900 ml-20">
+		{% for comment in comments %}
+			<li class="text-base mb-3 mt-3">
+				<form action="{% url 'forum:addlike' comment.uuid %}" style="display: inline;" method="post">
+					{% csrf_token %}
+					<fieldset style="border:none; display: inline;">
+						<span class="text-base font-bold">Likes: {{ comment.votes }} | </span>
 
-	<span class="current">
-		Page {{ comments.number }} of {{ comments.paginator.num_pages }}.
-	</span>
+						<input type="submit" value="Like it" class="btn-vote">
+					</fieldset>
+				</form>
+				<span class="text-base font-bold">{{ comment.username }}</span>
+				<span class="text-base">{{ comment.content }}</span>
+			</li>
+		{% endfor %}
+	</ul>
 
-	{% if comments.has_next %}
-		<a href="?page={{ comments.next_page_number }}">next &raquo;</a>
-	{% endif %}
-</div>
+	<div class="pagination">
+		{% if comments.has_previous %}
+		<a href="?page={{ comments.previous_page_number }}" class="btn-pag">&laquo; previous</a>
+		{% endif %}
 
-<br><br>
+		<span class="current text-base">
+			Page {{ comments.number }} of {{ comments.paginator.num_pages }}.
+		</span>
 
-<a href="{% url 'forum:newcomment' post.uuid %}">|||Add new comment|||</a>
+		{% if comments.has_next %}
+			<a href="?page={{ comments.next_page_number }}" class="btn-pag">next &raquo;</a>
+		{% endif %}
+	</div>
+
+	<br><br>
+
+	<a href="{% url 'forum:newcomment' post.uuid %}" class="btn-blue">|||Add new comment|||</a>
+{% endblock %}
