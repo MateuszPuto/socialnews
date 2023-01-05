@@ -16,3 +16,6 @@ class NewLocation(forms.Form):
 
 class Distance(forms.Form):
     range = forms.IntegerField(widget=forms.NumberInput(attrs={'type':'range', 'step': '1'}))
+
+class SearchBox(forms.Form):
+    query = forms.CharField(max_length=100)

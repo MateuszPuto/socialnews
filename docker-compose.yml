@@ -9,6 +9,7 @@ services:
         command: ./manage.py runserver 0.0.0.0:8000
         depends_on:
             - postgres
+            - elasticsearch
             - web-migration
         environment:
             POSTGRES_PASSWORD: postgres
@@ -54,6 +55,21 @@ services:
             - RABBITMQ_DEFAULT_USER=rabbitmq
             - RABBITMQ_DEFAULT_PASS=rabbitmq
             - RABBITMQ_DEFAULT_VHOST=my_vhost
+
+    elasticsearch:
+        image: elasticsearch:7.17.8
+        ports:
+            - 9200:9200
+        environment:
+            - xpack.security.enabled=false
+            - discovery.type=single-node
+
+    model_index:
+        build: .
+        command: ./manage.py search_index --rebuild
+        depends_on:
+            - elasticsearch
+            - web-migration
 
     worker:
         image: worker

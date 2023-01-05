@@ -58,10 +58,12 @@
           <span id="username" class="text-white">Logged in as <a href="{% url 'user:profile' %}" class="btn-blue">{{ user }}</a></span>
       {% endif %}
 
+
       <span style="float: right;">
-        <form class="flex flex-row">   
-          <input type="search" id="searchbar" class="grow text-gray-900 border border-gray-300 rounded-lg bg-gray-50" placeholder="Search posts" required>
-          <button type="submit" class="btn-blue">Search</button>
+        <form action="{% url 'forum:search' %}" method="post" class="flex flex-row">
+          {% csrf_token %}
+          {{ searchbar }}
+          <button type="submit" value="Search" class="btn-blue">Search</button>
         </form>
     </span>
 

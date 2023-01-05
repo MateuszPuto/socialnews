@@ -23,6 +23,7 @@ geocoder = "^1.38.1"
 django-ipware = "^4.0.2"
 numpy = "^1.24.1"
 folium = "^0.14.0"
+django-elasticsearch-dsl = "^7.2.2"
 
 
 [build-system]

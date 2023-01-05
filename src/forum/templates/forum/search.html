@@ -1,0 +1,16 @@
+<form action="{% url 'forum:search' %}" method="post">
+    {% csrf_token %}
+    <fieldset>
+        <legend>Input searched query: </legend>
+        
+        {{ searchbox }}
+        
+        <button type="submit" value="Search">Search</button>
+    </fieldset>
+  </form>
+
+<ul>
+    {% for result in results %}
+        <li>{{ result }}</li>
+    {% endfor %}
+</ul>

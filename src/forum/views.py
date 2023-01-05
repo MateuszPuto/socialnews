@@ -19,12 +19,12 @@ import folium
 import geocoder
 from ipware import get_client_ip
 
-from elasticsearch import Elasticsearch
-
+from forum.syntheticdata import populate_models
 from socialnews.tasks import haversine_distance
 
 from .models import Topic, Comment, VotedComments, VotedPosts, Location, UserLocal
-from .forms import NewTopic, NewComment, NewLocation, Distance
+from .forms import NewTopic, NewComment, NewLocation, Distance, SearchBox
+from .document import TopicDocument
 
 def index(request):
     latest_posts = Topic.objects.order_by('-pub_date')
@@ -44,6 +44,28 @@ def index(request):
         context["user"] = request.user.get_username()
 
     return render(request, 'forum/index.html', context)
+
+def fakedata(request):
+    populate_models()
+
+    return HttpResponse('Changes applied')
+
+def search(request):
+    if request.method == "POST":
+        searchbox = SearchBox(request.POST)
+
+        if searchbox.is_valid():
+            data = searchbox.cleaned_data
+
+            results = TopicDocument.search().query("match", title=data["query"])
+        else:
+            searchbox = SearchBox()
+            results = []
+    else:
+        searchbox = SearchBox()
+        results = ["Hello", "from", "results."]
+
+    return render(request, 'forum/search.html', {'searchbox': searchbox, 'results': results})
 
 ## This view should return posts that match user interests
 def feed(request):

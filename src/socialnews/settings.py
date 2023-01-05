@@ -44,6 +44,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    'django_elasticsearch_dsl',
     'django_extensions',
     'forum.apps.ForumConfig',
     'user.apps.UserConfig',
@@ -163,3 +164,12 @@ CACHES = {
 
 CELERY_RESULT_BACKEND = "rpc://"
 CELERY_BROKER_URL= "amqp://rabbitmq:rabbitmq@rabbitmq:5672/my_vhost"
+
+# Elasticsearch
+
+ELASTICSEARCH_DSL={
+    'default': {
+        'hosts': 'elasticsearch'
+    },
+}
+ELASTICSEARCH_DSL_AUTO_REFRESH=False
