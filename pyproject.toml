@@ -6,7 +6,7 @@ authors = ["MateuszPuto <mateuszmputo@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python="^3.8"
+python=">=3.8,<3.9.7 || >3.9.7,<4.0"
 django = "^4.1.3"
 psycopg2-binary = "^2.9.5"
 django-environ = "^0.9.0"
@@ -24,6 +24,8 @@ django-ipware = "^4.0.2"
 numpy = "^1.24.1"
 folium = "^0.14.0"
 django-elasticsearch-dsl = "^7.2.2"
+streamlit = "^1.16.0"
+streamlit-folium = "^0.10.0"
 
 
 [build-system]

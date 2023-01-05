@@ -1,9 +1,6 @@
-FROM python:3.11-alpine
+FROM python:3.11-bullseye
 EXPOSE 8000
 WORKDIR /src
-RUN --mount=type=cache,target=/var/cache/apk  \
-    ln -vs /var/cache/apk /etc/apk/cache && \
-	apk add --update gcc build-base
 ENV PIP_CACHE_DIR=/var/cache/pip
 
 # If this is set to a non-empty string, Python won’t try to write .pyc files on the import of source modules. This is equivalent to specifying the -B option.
@@ -14,7 +11,6 @@ ENV PYTHONDONTWRITEBYTECODE 1
 # https://docs.python.org/3/using/cmdline.html#envvar-PYTHONUNBUFFERED
 ENV PYTHONUNBUFFERED 1
 
-RUN apk add python3-dev py3-numpy build-base
 COPY requirements.txt .
 RUN --mount=type=cache,target=$PIP_CACHE_DIR \
     pip install -r requirements.txt && \

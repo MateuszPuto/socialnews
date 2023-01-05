@@ -32,5 +32,3 @@ def haversine_distance(point, point2):
     R = 6371
     
     return R * c
-
-    

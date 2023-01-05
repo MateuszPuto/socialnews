@@ -15,6 +15,8 @@ from datetime import datetime
 import random
 
 import folium
+import streamlit as st
+from streamlit_folium import folium_static
 
 import geocoder
 from ipware import get_client_ip
@@ -193,6 +195,10 @@ def likeit(request, comment_uuid):
 
 @login_required(login_url='/accounts/login/')
 def addtopic(request):
+    m = folium.Map()
+    m.add_child(folium.LatLngPopup())
+    folium_static(m)
+
     if request.method == 'POST':
         topic = NewTopic(request.POST)
 
@@ -228,7 +234,7 @@ def addtopic(request):
         topic = NewTopic()
         location = NewLocation()
 
-    return render(request, 'forum/newtopic.html', {'topic': topic, 'location': location})
+    return render(request, 'forum/newtopic.html', {'topic': topic, 'location': location, 'map': m._repr_html_()})
 
 @login_required(login_url='/accounts/login/')
 def comment(request, post_uuid):
