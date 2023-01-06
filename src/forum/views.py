@@ -22,9 +22,9 @@ import geocoder
 from ipware import get_client_ip
 
 from forum.syntheticdata import populate_models
-from socialnews.tasks import haversine_distance
+from socialnews.tasks import haversine_distance, classify_text
 
-from .models import Topic, Comment, VotedComments, VotedPosts, Location, UserLocal
+from .models import Topic, Comment, VotedComments, VotedPosts, Location, UserLocal, Tags
 from .forms import NewTopic, NewComment, NewLocation, Distance, SearchBox
 from .document import TopicDocument
 
@@ -59,7 +59,8 @@ def search(request):
         if searchbox.is_valid():
             data = searchbox.cleaned_data
 
-            results = TopicDocument.search().query("match", title=data["query"])
+            hits = TopicDocument.search().query("multi_match", query=data["query"], fields=["title", "content", "username"])
+            results = hits.to_queryset()
         else:
             searchbox = SearchBox()
             results = []
@@ -73,8 +74,15 @@ def search(request):
 def feed(request):
     user_feed = Topic.objects.order_by('-votes')
 
+    p = Paginator(user_feed, 10)
+
+    if request.GET.get('page'):
+        page_number = request.GET.get('page')
+    else:
+        page_number = 1
+
     context = {
-                'user_feed': user_feed,
+                'user_feed': p.page(page_number),
             }
 
     if request.user.is_authenticated:
@@ -85,9 +93,17 @@ def feed(request):
 def newest(request):
     newest_posts = Topic.objects.order_by('-pub_date')
 
+    p = Paginator(newest_posts, 10)
+
+    if request.GET.get('page'):
+        page_number = request.GET.get('page')
+    else:
+        page_number = 1
+
     context = {
-                'user_feed': newest_posts,
+                'user_feed': p.page(page_number),
             }
+
 
     if request.user.is_authenticated:
         context["user"] = request.user.get_username()
@@ -130,9 +146,16 @@ def local(request):
 
     local_posts = Topic.objects.filter(pk__in=lst)
 
+    p = Paginator(local_posts, 10)
+
+    if request.GET.get('page'):
+        page_number = request.GET.get('page')
+    else:
+        page_number = 1
+
     context = {
                 'range': range,
-                'user_feed': local_posts,
+                'user_feed': p.page(page_number),
             }
 
     if request.user.is_authenticated:
@@ -143,6 +166,7 @@ def local(request):
 def post(request, post_uuid):
     post = Topic.objects.get(pk=post_uuid)
     comments = Comment.objects.filter(topic=post).order_by('-votes')
+    tags = Tags.objects.filter(topic=post.uuid)
 
     p = Paginator(comments, 3)
 
@@ -158,6 +182,7 @@ def post(request, post_uuid):
 
     context = {
             'post': post,
+            'tags': tags,
             'comments': p.page(page_number),
             "loc": loc,
             }
@@ -212,6 +237,11 @@ def addtopic(request):
             tp.username = request.user.get_username()
             tp.geography = data["location"]
             tp.save()
+
+            labels = ["celebrity", "news", "science", "opinion", "sports", "fashion", "technology", "medical", "politics", "art"]
+            text = tp.title + ". " + tp.content
+
+            classify_text.delay(tp.uuid, text, labels)
 
             if tp.geography:
                 location = NewLocation(request.POST)

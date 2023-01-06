@@ -82,6 +82,11 @@ services:
             - rabbitmq
         environment:
             - CELERY_BROKER_URL=amqp://rabbitmq:rabbitmq@rabbitmq:5672/my_vhost
+            - POSTGRES_PASSWORD=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_DB=postgres
+            - POSTGRES_HOST=postgres
+            - POSTGRES_PORT=5432
 
     flower:
         image: flower

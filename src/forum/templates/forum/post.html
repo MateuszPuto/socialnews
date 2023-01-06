@@ -15,6 +15,12 @@
 		<div class="font-bold">Posted by: {{ post.username }}</div>
 	</p>
 
+	<ol class="flex flex-row">
+		{% for tag in tags %}
+			<li class="bg-red-400 text-white font-bold py-2 px-4 rounded-full">{{ tag.tag_name }}</li>
+		{% endfor %}
+	</ol>
+	
 	<ul class="divide-y-2 divide-base-900 ml-20">
 		{% for comment in comments %}
 			<li class="text-base mb-3 mt-3">

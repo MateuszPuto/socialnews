@@ -47,3 +47,8 @@ class UserLocal(models.Model):
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
     username = models.CharField(max_length=50)
     distance = models.FloatField()
+
+class Tags(models.Model):
+    topic = models.UUIDField(default=uuid.uuid4, editable=True)
+    tag_name = models.CharField(max_length=20)
+    tag_value = models.FloatField()

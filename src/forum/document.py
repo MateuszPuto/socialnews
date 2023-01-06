@@ -19,6 +19,5 @@ class TopicDocument(Document):
             'title',
             'url',
             'content',
-            'pub_date',
             'username',
         ]

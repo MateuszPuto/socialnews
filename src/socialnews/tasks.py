@@ -1,19 +1,6 @@
-# Create your tasks here
 from celery import shared_task
 
-@shared_task
-def add_nums(x, y):
-    return x + y
-
-
-@shared_task
-def mul_nums(x, y):
-    return x * y
-
-
-@shared_task
-def xsum_nums(numbers):
-    return sum(numbers)
+from forum.models import Tags, Topic
 
 @shared_task
 def haversine_distance(point, point2):
@@ -32,3 +19,16 @@ def haversine_distance(point, point2):
     R = 6371
     
     return R * c
+
+@shared_task
+def classify_text(tp, text, labels):
+    from transformers import pipeline
+
+    classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
+    d = classifier(text, labels)
+
+    tagging = [x for x in list(zip(d['labels'], d['scores'])) if x[1] > 0.15]
+
+    for t in tagging:
+        tag = Tags(topic=tp, tag_name=t[0], tag_value=t[1])
+        tag.save()

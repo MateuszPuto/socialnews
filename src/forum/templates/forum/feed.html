@@ -15,9 +15,11 @@
 				<li class="flex flex-row mb-3 mt-3">
 					<form action="{% url 'forum:vote' post.uuid %}" style="display: inline;" method="post">
 						{% csrf_token %}
-						<fieldset style="border:none; display: inline;" class="w-32 font-bold">
-								<span>Votes: {{ post.votes }} | </span>
-								<input type="submit" value="Vote" class="btn-vote">
+						<fieldset style="border:none; display: inline;" class="font-bold">
+							<div class="flex flex-row">
+								<div class="w-28"><span>Votes: {{ post.votes }} | </span></div>
+								<div class="w-16"><input type="submit" value="Vote" class="btn-vote"></div>
+							</div>
 						</fieldset>
 					</form>
 					<div class="w-96">
