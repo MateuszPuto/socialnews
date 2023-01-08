@@ -10,6 +10,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 
+from django.contrib import messages
+
 from datetime import datetime
 
 import random
@@ -22,16 +24,16 @@ import geocoder
 from ipware import get_client_ip
 
 from forum.syntheticdata import populate_models
-from socialnews.tasks import haversine_distance, classify_text
+from socialnews.tasks import haversine_distance, classify_text, calculate_interests
 
 from .models import Topic, Comment, VotedComments, VotedPosts, Location, UserLocal, Tags
 from .forms import NewTopic, NewComment, NewLocation, Distance, SearchBox
 from .document import TopicDocument
 
 def index(request):
-    latest_posts = Topic.objects.order_by('-pub_date')
+    user_feed = Topic.objects.order_by('-votes')
 
-    p = Paginator(latest_posts, 10)
+    p = Paginator(user_feed, 10)
 
     if request.GET.get('page'):
         page_number = request.GET.get('page')
@@ -50,7 +52,9 @@ def index(request):
 def fakedata(request):
     populate_models()
 
-    return HttpResponse('Changes applied')
+    messages.add_message(request, messages.INFO, 'Changes applied')
+
+    return render(request, 'forum/index.html')
 
 def search(request):
     if request.method == "POST":
@@ -66,7 +70,7 @@ def search(request):
             results = []
     else:
         searchbox = SearchBox()
-        results = ["Hello", "from", "results."]
+        results = []
 
     return render(request, 'forum/search.html', {'searchbox': searchbox, 'results': results})
 
@@ -127,6 +131,7 @@ def local(request):
     posts = Location.objects.select_related('relates')
 
     ip, is_routable = get_client_ip(request)
+    # Hardcoded IP because in local development there is no public IP available
     curr = geocoder.ipinfo("31.182.202.212").latlng
 
     UserLocal.objects.all().delete()
@@ -201,6 +206,8 @@ def voteit(request, post_uuid):
         vt = VotedPosts.objects.create(username=request.user.get_username(), voted=tp.uuid)
         vt.save()
 
+    calculate_interests.delay(request.user.get_username())
+
     return HttpResponseRedirect(reverse('forum:index'))
 
 def likeit(request, comment_uuid):
@@ -238,10 +245,9 @@ def addtopic(request):
             tp.geography = data["location"]
             tp.save()
 
-            labels = ["celebrity", "news", "science", "opinion", "sports", "fashion", "technology", "medical", "politics", "art"]
             text = tp.title + ". " + tp.content
 
-            classify_text.delay(tp.uuid, text, labels)
+            classify_text.delay(tp.uuid, text)
 
             if tp.geography:
                 location = NewLocation(request.POST)

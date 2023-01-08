@@ -1,6 +1,8 @@
 from celery import shared_task
 
-from forum.models import Tags, Topic
+from forum.models import Tags, Topic, VotedPosts
+
+labels = ["celebrity", "news", "science", "opinion", "sports", "fashion", "technology", "medical", "politics", "art"]
 
 @shared_task
 def haversine_distance(point, point2):
@@ -21,10 +23,10 @@ def haversine_distance(point, point2):
     return R * c
 
 @shared_task
-def classify_text(tp, text, labels):
+def classify_text(tp, text):
     from transformers import pipeline
 
-    classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
+    classifier = pipeline("zero-shot-classification", model="../../models/bart-large-mnli")
     d = classifier(text, labels)
 
     tagging = [x for x in list(zip(d['labels'], d['scores'])) if x[1] > 0.15]
@@ -32,3 +34,32 @@ def classify_text(tp, text, labels):
     for t in tagging:
         tag = Tags(topic=tp, tag_name=t[0], tag_value=t[1])
         tag.save()
+
+    return tagging
+
+@shared_task
+def calculate_interests(username):
+    interests = {}
+    for label in labels:
+        interests[label] = 0
+
+    posts = VotedPosts.objects.filter(username=username)
+
+    sum_values = 0 
+    for post in posts:
+        contains = Tags.objects.filter(topic=post.voted)
+
+        for tag in contains:
+            if tag.tag_name in interests:
+                interests[tag.tag_name] += tag.tag_value
+                sum_values += tag.tag_value
+
+
+    for k, v in interests.items():
+        interests[k] = v / sum_values
+
+    return interests
+
+        
+        
+

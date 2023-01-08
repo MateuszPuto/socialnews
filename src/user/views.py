@@ -10,6 +10,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 
+from django.contrib import messages
+
 from datetime import datetime
 
 import random
@@ -31,7 +33,9 @@ def create_account(request):
             new_user.last_name = data["last_name"]
             new_user.save()
 
-            return HttpResponse(f'Thanks {data["username"]} for registering on your site.')
+            messages.add_message(request, messages.INFO, f'Thanks {data["username"]} for registering on your site.')
+
+            return render(request, 'user/profile.html')
     else:
         form = CreateAccount()
 
@@ -48,7 +52,9 @@ def profile(request):
 
         return render(request, 'user/profile.html', context)
     else:
-        return HttpResponse("Something went wrong.")
+        messages.add_message(request, messages.WARNING, "Something went wrong.")
+
+        return render(request, 'user/login')
 
 @login_required(login_url='/accounts/login/')
 def check_password_if_valid(request):
@@ -59,9 +65,13 @@ def check_password_if_valid(request):
         if form.is_valid():
             data = form.cleaned_data
             if user.check_password(raw_password=data["password"]):
-              return HttpResponse("This is valid password.")
+                messages.add_message(request, messages.INFO, 'This is valid password.')
+
+                return render(request, 'user/profile')
             else:
-                return HttpResponse("This is not a valid password.")
+                messages.add_message(request, messages.INFO, 'This is not a valid password.')
+
+                return render(request, 'user/profile')
     else:
         form = CheckPassword()
 
