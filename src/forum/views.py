@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.contrib import messages
 
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 import random
 
@@ -24,7 +24,7 @@ import geocoder
 from ipware import get_client_ip
 
 from forum.syntheticdata import populate_models
-from socialnews.tasks import haversine_distance, classify_text, calculate_interests
+from socialnews.tasks import haversine_distance, classify_text, calculate_interests, predict_user_posts
 
 from .models import Topic, Comment, VotedComments, VotedPosts, Location, UserLocal, Tags
 from .forms import NewTopic, NewComment, NewLocation, Distance, SearchBox
@@ -76,7 +76,9 @@ def search(request):
 
 ## This view should return posts that match user interests
 def feed(request):
-    user_feed = Topic.objects.order_by('-votes')
+    posts_uuid = predict_user_posts.delay(request.user.get_username()).get()
+
+    user_feed = Topic.objects.filter(uuid__in=posts_uuid)
 
     p = Paginator(user_feed, 10)
 
@@ -171,7 +173,7 @@ def local(request):
 def post(request, post_uuid):
     post = Topic.objects.get(pk=post_uuid)
     comments = Comment.objects.filter(topic=post).order_by('-votes')
-    tags = Tags.objects.filter(topic=post.uuid)
+    tags = Tags.objects.filter(topic=post)
 
     p = Paginator(comments, 3)
 

@@ -1,6 +1,6 @@
 FROM python:3.11-bullseye
 EXPOSE 8000
-WORKDIR /src
+WORKDIR /app
 ENV PIP_CACHE_DIR=/var/cache/pip
 
 # If this is set to a non-empty string, Python won’t try to write .pyc files on the import of source modules. This is equivalent to specifying the -B option.

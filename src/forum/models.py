@@ -49,6 +49,14 @@ class UserLocal(models.Model):
     distance = models.FloatField()
 
 class Tags(models.Model):
-    topic = models.UUIDField(default=uuid.uuid4, editable=True)
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
     tag_name = models.CharField(max_length=20)
     tag_value = models.FloatField()
+
+class About(models.Model):
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
+    vals = models.JSONField()
+
+class Interest(models.Model):
+    username = models.CharField(max_length=50)
+    vals = models.JSONField()
