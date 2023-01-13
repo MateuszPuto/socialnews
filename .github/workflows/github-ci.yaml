@@ -12,5 +12,11 @@ jobs:
         - name: Install dependencies
           run: pip install -r requirements.txt
         
+        - name: Create volume BART-mnli
+          run: docker volume create --name=bart-mnli
+
         - name: Docker compose
           run: DOCKER_BUILDKIT=1 docker-compose up --build
+
+        - name: Run tests
+          run: src/manage.py test
