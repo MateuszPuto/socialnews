@@ -1,11 +1,16 @@
-# name: build my app
-# on: [push]
-# jobs:
-#   build-app:
-#     runs-on: ubuntu-latest
-#     steps:
-#         - uses: actions/checkout@v3
-#         - name: install dependencies
-#           run: pip install -r requirements.txt
-        # - name: docker compose
-        #   run: DOCKER_BUILDKIT=1 docker-compose up --build
+name: Build my app
+on: [push]
+jobs:
+  build-app:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v3
+        
+        - name: Install dependencies
+          run: pip install -r requirements.txt
+        
+        - name: Docker compose
+          run: DOCKER_BUILDKIT=1 docker-compose up --build
