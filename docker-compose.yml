@@ -1,5 +1,3 @@
-
-
 version: "3.9"
 services:
     web:
@@ -17,6 +15,8 @@ services:
             POSTGRES_DB: postgres
             POSTGRES_HOST: postgres
             POSTGRES_PORT: 5432
+        volumes:
+            - /home/mputo/socialnews/bbc:/bbc
 
     web-migration:
         build: .
@@ -72,6 +72,7 @@ services:
         depends_on:
             - elasticsearch
             - web-migration
+            - web
 
     worker:
         image: worker
@@ -106,7 +107,5 @@ services:
         environment:
             - CELERY_BROKER_URL=amqp://rabbitmq:rabbitmq@rabbitmq:5672/my_vhost
 volumes:
-    bart-mnli:
-        external: true
     db:
         driver: local

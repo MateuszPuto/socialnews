@@ -54,7 +54,7 @@ def fakedata(request):
 
     messages.add_message(request, messages.INFO, 'Changes applied')
 
-    return render(request, 'forum/index.html')
+    return render(request, 'forum/messages.html')
 
 def search(request):
     if request.method == "POST":
@@ -74,7 +74,6 @@ def search(request):
 
     return render(request, 'forum/search.html', {'searchbox': searchbox, 'results': results})
 
-## This view should return posts that match user interests
 def feed(request):
     posts_uuid = predict_user_posts.delay(request.user.get_username()).get()
 
@@ -175,7 +174,7 @@ def post(request, post_uuid):
     comments = Comment.objects.filter(topic=post).order_by('-votes')
     tags = Tags.objects.filter(topic=post)
 
-    p = Paginator(comments, 3)
+    p = Paginator(comments, 5)
 
     if Location.objects.filter(relates=post).exists():
         loc  = Location.objects.get(relates=post).__str__()

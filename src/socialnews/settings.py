@@ -173,3 +173,7 @@ ELASTICSEARCH_DSL={
     },
 }
 ELASTICSEARCH_DSL_AUTO_REFRESH=False
+
+# Message storage
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'

@@ -33,9 +33,9 @@ def create_account(request):
             new_user.last_name = data["last_name"]
             new_user.save()
 
-            messages.add_message(request, messages.INFO, f'Thanks {data["username"]} for registering on your site.')
+            messages.add_message(request, messages.INFO, f'Thanks {data["username"]} for registering on our site.')
 
-            return render(request, 'user/profile.html')
+            return render(request, 'user/messages.html')
     else:
         form = CreateAccount()
 
@@ -51,10 +51,6 @@ def profile(request):
         context["password"] = ""
 
         return render(request, 'user/profile.html', context)
-    else:
-        messages.add_message(request, messages.WARNING, "Something went wrong.")
-
-        return render(request, 'user/login')
 
 @login_required(login_url='/accounts/login/')
 def check_password_if_valid(request):
@@ -67,11 +63,11 @@ def check_password_if_valid(request):
             if user.check_password(raw_password=data["password"]):
                 messages.add_message(request, messages.INFO, 'This is valid password.')
 
-                return render(request, 'user/profile')
+                return render(request, 'user/messages.html')
             else:
-                messages.add_message(request, messages.INFO, 'This is not a valid password.')
+                messages.add_message(request, messages.WARNING, 'This is not a valid password.')
 
-                return render(request, 'user/profile')
+                return render(request, 'user/messages.html')
     else:
         form = CheckPassword()
 
