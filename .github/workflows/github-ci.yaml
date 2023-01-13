@@ -2,7 +2,7 @@ name: Build my app
 on: [push]
 jobs:
   build-app:
-    timeout-minutes: 15
+    timeout-minutes: 18
     runs-on: ubuntu-latest
     
     steps:
@@ -16,7 +16,11 @@ jobs:
           run: docker volume create --name=bart-mnli
 
         - name: Docker compose
-          run: DOCKER_BUILDKIT=1 docker-compose up --build
+          run: DOCKER_BUILDKIT=1 docker-compose up --build -d
 
         - name: Run tests
           run: src/manage.py test
+
+        - name: Stop containers
+          if: always()
+          run: docker-compose down
